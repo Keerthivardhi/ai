@@ -1,0 +1,96 @@
+Write the python program for Water Jug Problem.
+
+
+
+
+
+from collections import deque
+
+# Function to find possible moves
+def find_moves(state, jug1_capacity, jug2_capacity):
+    moves = []
+    jug1, jug2 = state
+
+    # Fill jug1
+    if jug1 < jug1_capacity:
+        moves.append(('fill', 1))
+    # Fill jug2
+    if jug2 < jug2_capacity:
+        moves.append(('fill', 2))
+    # Empty jug1
+    if jug1 > 0:
+        moves.append(('empty', 1))
+    # Empty jug2
+    if jug2 > 0:
+        moves.append(('empty', 2))
+    # Pour from jug1 to jug2
+    if jug1 > 0 and jug2 < jug2_capacity:
+        amount = min(jug1, jug2_capacity - jug2)
+        moves.append(('pour', 1, 2, amount))
+    # Pour from jug2 to jug1
+    if jug2 > 0 and jug1 < jug1_capacity:
+        amount = min(jug2, jug1_capacity - jug1)
+        moves.append(('pour', 2, 1, amount))
+
+    return moves
+
+# Function to apply the move
+def apply_move(state, move):
+    jug1, jug2 = state
+    action, *args = move
+
+    if action == 'fill':
+        if args[0] == 1:
+            return (jug1_capacity, jug2)
+        else:
+            return (jug1, jug2_capacity)
+    elif action == 'empty':
+        if args[0] == 1:
+            return (0, jug2)
+        else:
+            return (jug1, 0)
+    elif action == 'pour':
+        from_jug, to_jug, amount = args
+        if from_jug == 1:
+            return (jug1 - amount, jug2 + amount)
+        else:
+            return (jug1 + amount, jug2 - amount)
+
+# Function to solve the Water Jug Problem
+def solve_water_jug(jug1_capacity, jug2_capacity, target_amount):
+    visited = set()
+    queue = deque([((0, 0), [])])
+
+    while queue:
+        current_state, path = queue.popleft()
+        visited.add(current_state)
+
+        if target_amount in current_state:
+            return path
+
+        for move in find_moves(current_state, jug1_capacity, jug2_capacity):
+            new_state = apply_move(current_state, move)
+            if new_state not in visited:
+                queue.append((new_state, path + [move]))
+
+    return None
+
+# Main function
+if __name__ == "__main__":
+    jug1_capacity = 4
+    jug2_capacity = 3
+    target_amount = 2
+
+    solution = solve_water_jug(jug1_capacity, jug2_capacity, target_amount)
+
+    if solution:
+        print("Solution found with {} steps:".format(len(solution)))
+        for step in solution:
+            if step[0] == 'fill':
+                print("Fill jug {}.".format(step[1]))
+            elif step[0] == 'empty':
+                print("Empty jug {}.".format(step[1]))
+            elif step[0] == 'pour':
+                print("Pour from jug {} to jug {}.".format(step[1], step[2]))
+    else:
+        print("No solution found.")
