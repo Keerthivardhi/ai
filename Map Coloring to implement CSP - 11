@@ -1,0 +1,57 @@
+Write the python program for Map Coloring to implement CSP.
+
+
+
+
+
+class MapColoring:
+    def __init__(self, variables, domains, constraints):
+        self.variables = variables
+        self.domains = domains
+        self.constraints = constraints
+
+    def is_consistent(self, variable, assignment):
+        for neighbor in self.constraints[variable]:
+            if neighbor in assignment and assignment[neighbor] == assignment[variable]:
+                return False
+        return True
+
+    def backtracking_search(self, assignment={}):
+        if len(assignment) == len(self.variables):
+            return assignment
+
+        unassigned_variables = [var for var in self.variables if var not in assignment]
+        first_unassigned_variable = unassigned_variables[0]
+
+        for value in self.domains[first_unassigned_variable]:
+            if self.is_consistent(first_unassigned_variable, {**assignment, **{first_unassigned_variable: value}}):
+                new_assignment = {**assignment, **{first_unassigned_variable: value}}
+                result = self.backtracking_search(new_assignment)
+                if result:
+                    return result
+
+        return None
+
+if __name__ == "__main__":
+    # Example map coloring problem
+    variables = ['WA', 'NT', 'SA', 'Q', 'NSW', 'V', 'T']
+    domains = {variable: ['Red', 'Green', 'Blue'] for variable in variables}
+    constraints = {
+        'WA': ['NT', 'SA'],
+        'NT': ['WA', 'SA', 'Q'],
+        'SA': ['WA', 'NT', 'Q', 'NSW', 'V'],
+        'Q': ['NT', 'SA', 'NSW'],
+        'NSW': ['SA', 'Q', 'V'],
+        'V': ['SA', 'NSW'],
+        'T': []
+    }
+
+    map_coloring = MapColoring(variables, domains, constraints)
+    solution = map_coloring.backtracking_search()
+
+    if solution:
+        print("Map Coloring Solution:")
+        for variable, color in solution.items():
+            print(f"{variable}: {color}")
+    else:
+        print("No solution found.")
