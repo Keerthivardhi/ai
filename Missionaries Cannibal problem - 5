@@ -1,0 +1,62 @@
+Write the python program for Missionaries Cannibal problem.
+
+
+
+
+
+from collections import deque
+
+# Define the initial state
+INITIAL_STATE = (3, 3, 1)  # (missionaries on the left, cannibals on the left, boat position)
+GOAL_STATE = (0, 0, 0)  # (missionaries on the left, cannibals on the left, boat position)
+
+# Function to find valid moves
+def find_moves(state):
+    moves = []
+    m, c, b = state
+
+    # Possible moves from the left bank to the right bank
+    if b == 1:  # If the boat is on the left side
+        for m_delta, c_delta in [(0, 1), (0, 2), (1, 0), (1, 1), (2, 0)]:
+            if 0 <= m - m_delta <= 3 and 0 <= c - c_delta <= 3 and m - m_delta >= c - c_delta:
+                moves.append((-m_delta, -c_delta, -1))
+    else:  # If the boat is on the right side
+        for m_delta, c_delta in [(0, -1), (0, -2), (-1, 0), (-1, -1), (-2, 0)]:
+            if 0 <= m - m_delta <= 3 and 0 <= c - c_delta <= 3 and m - m_delta >= c - c_delta:
+                moves.append((m_delta, c_delta, 1))
+
+    return moves
+
+# Function to apply a move to a state
+def apply_move(state, move):
+    return tuple(s + delta for s, delta in zip(state, move))
+
+# Function to solve the Missionaries and Cannibals problem
+def solve_missionaries_cannibals():
+    visited = set()
+    queue = deque([(INITIAL_STATE, [])])
+
+    while queue:
+        current_state, path = queue.popleft()
+        visited.add(current_state)
+
+        if current_state == GOAL_STATE:
+            return path
+
+        for move in find_moves(current_state):
+            new_state = apply_move(current_state, move)
+            if new_state not in visited:
+                queue.append((new_state, path + [new_state]))
+
+    return None
+
+# Main function
+if __name__ == "__main__":
+    solution = solve_missionaries_cannibals()
+
+    if solution:
+        print("Solution found with {} steps:".format(len(solution)))
+        for step in solution:
+            print(step)
+    else:
+        print("No solution found.")
