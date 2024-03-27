@@ -1,0 +1,49 @@
+Write the python program to solve 8-Queen problem.
+
+
+
+
+
+def is_safe(board, row, col):
+    # Check if there's a queen in the same column
+    for i in range(row):
+        if board[i] == col:
+            return False
+
+        # Check diagonals
+        if abs(i - row) == abs(board[i] - col):
+            return False
+
+    return True
+
+def solve_queens(board, row):
+    if row == len(board):
+        return True
+
+    for col in range(len(board)):
+        if is_safe(board, row, col):
+            board[row] = col
+
+            if solve_queens(board, row + 1):
+                return True
+
+            board[row] = -1
+
+    return False
+
+def print_solution(board):
+    for row in board:
+        line = ['.'] * len(board)
+        line[row] = 'Q'
+        print(' '.join(line))
+
+def solve_8_queens():
+    board = [-1] * 8  # Initialize board, -1 means no queen is placed in that row
+    if solve_queens(board, 0):
+        print("Solution found:")
+        print_solution(board)
+    else:
+        print("No solution found.")
+
+if __name__ == "__main__":
+    solve_8_queens()
