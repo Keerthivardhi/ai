@@ -1,0 +1,39 @@
+Write the python to implement Travelling Salesman Problem.
+
+
+
+
+
+import itertools
+import sys
+
+def tsp_brute_force(graph):
+    num_cities = len(graph)
+    min_cost = sys.maxsize
+    min_path = []
+
+    for path in itertools.permutations(range(1, num_cities)):
+        cost = graph[0][path[0]]  # Cost from starting city to the first city in the permutation
+        for i in range(num_cities - 2):
+            cost += graph[path[i]][path[i+1]]  # Cost between consecutive cities
+        cost += graph[path[-1]][0]  # Cost from the last city in the permutation back to the starting city
+
+        if cost < min_cost:
+            min_cost = cost
+            min_path = [0] + list(path) + [0]
+
+    return min_path, min_cost
+
+if __name__ == "__main__":
+    # Example graph representing distances between cities
+    graph = [
+        [0, 10, 15, 20],
+        [10, 0, 35, 25],
+        [15, 35, 0, 30],
+        [20, 25, 30, 0]
+    ]
+
+    min_path, min_cost = tsp_brute_force(graph)
+
+    print("Minimum cost path:", min_path)
+    print("Minimum cost:", min_cost)
